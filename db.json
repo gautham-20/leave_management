@@ -8,34 +8,19 @@
       "role": "ADMIN"
     },
     {
-      "id": "siDxW4epm8U",
+      "id": "2",
       "name": "Manager Sarah",
-      "email": "man@gmail",
+      "email": "man@gmail.com",
       "password": "man",
       "role": "MANAGER"
     },
     {
-      "id": "PJJdvR2Ujq8",
+      "id": "3",
       "name": "GAUTHAM",
-      "email": "ab@gmail",
+      "email": "ab@gmail.com",
       "password": "1234",
       "role": "EMPLOYEE"
-    },
-    {
-      "id": "xY7zK9Lp2mQ",
-      "name": "Jane Smith",
-      "email": "jane@test.com",
-      "password": "123",
-      "role": "EMPLOYEE"
-    },
-    {
-      "name": "RAM",
-      "email": "ram@gmail.com",
-      "password": "123",
-      "role": "EMPLOYEE",
-      "id": "hv42JkOXFuw"
     }
   ],
-  "leaves": [],
-  "$schema": "./node_modules/json-server/schema.json"
+  "leaves": []
 }

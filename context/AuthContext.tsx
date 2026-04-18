@@ -18,8 +18,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  // IMPORTANT: Replace the string below with your actual Render URL
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://leave-management-api-ekh9.onrender.com";
+  // Ensure this matches your Render Service name exactly
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://leave-management-ekh9.onrender.com";
   const API_URL = `${API_BASE}/users`;
 
   const signup = async (userData: User) => {
@@ -27,16 +27,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
+        // Explicitly defining the body to prevent sending any hidden "id" fields
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role
+        }),
       });
 
       if (response.ok) {
         const newUser = await response.json();
         setUser({ name: newUser.name, email: newUser.email, role: newUser.role });
         handleRedirect(newUser.role);
+      } else {
+        const errorData = await response.text();
+        console.error("Signup failed server response:", errorData);
+        alert("Signup failed. This email might already be taken or the server path is wrong.");
       }
     } catch (error) {
-      alert("Failed to connect to the API. Ensure your Render service is active.");
+      console.error("Signup Error:", error);
+      alert("Failed to connect to the API. Check your internet or Render status.");
     }
   };
 
@@ -60,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({ name: foundUser.name, email: foundUser.email, role: foundUser.role });
       handleRedirect(foundUser.role);
     } catch (error) {
+      console.error("Login Error:", error);
       alert("Login failed. Check if the backend is running.");
     }
   };
