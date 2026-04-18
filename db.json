@@ -20,7 +20,63 @@
       "email": "ab@gmail.com",
       "password": "1234",
       "role": "EMPLOYEE"
+    },
+    {
+      "id": "1776528296678",
+      "name": "Sam",
+      "email": "bsam@gmail.com",
+      "password": "123",
+      "role": "EMPLOYEE"
+    },
+    {
+      "id": "1776532245598",
+      "name": "Gautham",
+      "email": "gautham@gmail.com",
+      "password": "123",
+      "role": "EMPLOYEE"
+    },
+    {
+      "id": "1776532495386",
+      "name": "manager",
+      "email": "man1@gmail.com",
+      "password": "man",
+      "role": "EMPLOYEE"
+    },
+    {
+      "id": "1776532577644",
+      "name": "ABC",
+      "email": "am@gmail.com",
+      "password": "123",
+      "role": "MANAGER"
     }
   ],
-  "leaves": []
+  "leaves": [
+    {
+      "id": 1776528610112,
+      "type": "Vacation",
+      "startDate": "2026-04-20",
+      "endDate": "2026-04-25",
+      "reason": "a trip to America",
+      "employee": "Sam",
+      "status": "Approved"
+    },
+    {
+      "id": 1776529824616,
+      "type": "Vacation",
+      "startDate": "2026-05-05",
+      "endDate": "2026-05-12",
+      "reason": "A trip to Canada",
+      "employee": "Sam",
+      "status": "Approved"
+    },
+    {
+      "id": 1776532912502,
+      "type": "Vacation",
+      "startDate": "2026-04-18",
+      "endDate": "2026-04-25",
+      "reason": "vacation",
+      "employee": "Gautham",
+      "status": "Approved"
+    }
+  ]
 }
