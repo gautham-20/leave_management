@@ -1,4 +1,4 @@
-export default function StatCard({ title, used, total, colorHex }: { title: string, used: number, total: number, colorHex: string }) {
+export default function StatCard({ title, used, total, colorHex }: { title: string, used: number, total: number, colorHex: string, label?: string; }) {
   const percentage = (used / total) * 100;
   
   return (

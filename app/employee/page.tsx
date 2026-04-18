@@ -95,13 +95,13 @@ export default function EmployeePage() {
       return;
     }
 
-    // 2. Strict Sunday Check (Start and End)
+    // 2. Strict Sunday Check
     if (isSunday(form.startDate) || isSunday(form.endDate)) {
       alert("Your leave period cannot start or end on a Sunday. Please adjust your dates.");
       return;
     }
 
-    // 3. Working Days Calculation (Excluding Sundays in the middle)
+    // 3. Working Days Calculation
     const requestedDays = countWorkingDays(form.startDate, form.endDate);
     const limit = LEAVE_LIMITS[form.type as keyof typeof LEAVE_LIMITS];
 
@@ -111,11 +111,11 @@ export default function EmployeePage() {
       return;
     }
 
+    // --- CORRECTED ADDLEAVE CALL ---
+    // status and id are removed here because context/addLeave generates them automatically
     addLeave({
       ...form,
       employee: `${user.name}`,
-      status: "Pending",
-      id: Date.now(),
     });
 
     alert("Leave Request Submitted!");
@@ -123,7 +123,7 @@ export default function EmployeePage() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h1 style={{ marginBottom: "2rem" }}>My Dashboard</h1>
 
       <div className="grid-3">

@@ -62,8 +62,7 @@ export default function AdminPage() {
           used={analytics.total > 0 ? 1 : 0} 
           total={1} 
           colorHex="var(--primary)" 
-          // Custom label for the StatCard if you modified it to accept one:
-          label={analytics.mostCommonType} 
+          
         />
       </div>
 
