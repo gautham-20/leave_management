@@ -1,0 +1,41 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin User",
+      "email": "admin@test.com",
+      "password": "123",
+      "role": "ADMIN"
+    },
+    {
+      "id": "siDxW4epm8U",
+      "name": "Manager Sarah",
+      "email": "man@gmail",
+      "password": "man",
+      "role": "MANAGER"
+    },
+    {
+      "id": "PJJdvR2Ujq8",
+      "name": "GAUTHAM",
+      "email": "ab@gmail",
+      "password": "1234",
+      "role": "EMPLOYEE"
+    },
+    {
+      "id": "xY7zK9Lp2mQ",
+      "name": "Jane Smith",
+      "email": "jane@test.com",
+      "password": "123",
+      "role": "EMPLOYEE"
+    },
+    {
+      "name": "RAM",
+      "email": "ram@gmail.com",
+      "password": "123",
+      "role": "EMPLOYEE",
+      "id": "hv42JkOXFuw"
+    }
+  ],
+  "leaves": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
