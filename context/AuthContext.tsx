@@ -17,9 +17,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  const API_URL = "http://localhost:5001/users";
 
-  // 1. SIGN UP: Stores data in db.json
+  /** * CHANGE: This checks if you have a production URL set.
+   * Replace 'your-api-link.onrender.com' with your actual Render API link later.
+   **/
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = `${API_BASE}/users`;
+
+  // 1. SIGN UP
   const signup = async (userData: User) => {
     try {
       const response = await fetch(API_URL, {
@@ -32,56 +37,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const newUser = await response.json();
         setUser({ name: newUser.name, email: newUser.email, role: newUser.role });
         handleRedirect(newUser.role);
+      } else {
+        alert("Signup failed. Ensure the backend is running.");
       }
     } catch (error) {
-      alert("Error saving user to database");
+      console.error("Signup Error:", error);
+      alert("Cannot connect to server. Did you start json-server with --cors?");
     }
   };
 
-  // 2. LOGIN: Checks db.json for matching email, password, and role
+  // 2. LOGIN
   const login = async (email: string, password: string, role: Role) => {
-  try {
-    const response = await fetch(`${API_URL}?email=${email}`);
+    try {
+      // json-server allows filtering via query strings
+      const response = await fetch(`${API_URL}?email=${email}`);
 
-    if (!response.ok) {
-      throw new Error("Server error");
+      if (!response.ok) throw new Error("Server error");
+
+      const data = await response.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        alert("User not found! Please sign up first.");
+        return;
+      }
+
+      const foundUser = data[0];
+
+      // Security check for password and role
+      if (foundUser.password !== password || foundUser.role !== role) {
+        alert("Invalid credentials or role selection!");
+        return;
+      }
+
+      setUser({
+        name: foundUser.name,
+        email: foundUser.email,
+        role: foundUser.role,
+      });
+
+      handleRedirect(foundUser.role);
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Connection failed. Check your internet or backend status.");
     }
-
-    const data = await response.json();
-
-    console.log("LOGIN DATA:", data); 
-
-    if (!Array.isArray(data)) {
-      alert("Invalid server response");
-      return;
-    }
-
-    if (data.length === 0) {
-      alert("User not found! Please sign up first.");
-      return;
-    }
-
-    const foundUser = data[0];
-
-    if (foundUser.password !== password || foundUser.role !== role) {
-      alert("Invalid password or role selection!");
-      return;
-    }
-
-   
-    setUser({
-      name: foundUser.name,
-      email: foundUser.email,
-      role: foundUser.role,
-    });
-
-    handleRedirect(foundUser.role);
-
-  } catch (error) {
-    console.error(error);
-    alert("Backend not running or connection failed");
-  }
-};
+  };
 
   const handleRedirect = (role: Role) => {
     if (role === "EMPLOYEE") router.push("/employee");
