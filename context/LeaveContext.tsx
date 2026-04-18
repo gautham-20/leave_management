@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export type LeaveRequest = {
   id: number;
@@ -13,24 +13,62 @@ export type LeaveRequest = {
 
 interface LeaveContextType {
   leaves: LeaveRequest[];
-  addLeave: (leave: Omit<LeaveRequest, "id" | "status">) => void;
-  updateStatus: (id: number, status: "Approved" | "Rejected") => void;
+  addLeave: (leave: Omit<LeaveRequest, "id" | "status">) => Promise<void>;
+  updateStatus: (id: number, status: "Approved" | "Rejected") => Promise<void>;
 }
 
 const LeaveContext = createContext<LeaveContextType | undefined>(undefined);
 
 export function LeaveProvider({ children }: { children: ReactNode }) {
-  const [leaves, setLeaves] = useState<LeaveRequest[]>([
-    { id: 1, employee: "John Doe", type: "Vacation", startDate: "2026-05-01", endDate: "2026-05-05", status: "Pending", reason: "Family trip" },
-    { id: 2, employee: "Jane Smith", type: "Sick Leave", startDate: "2026-04-10", endDate: "2026-04-12", status: "Approved", reason: "Fever" }
-  ]);
+  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
+  
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://leave-management-api-ekh9.onrender.com";
+  const API_URL = `${API_BASE}/leaves`;
 
-  const addLeave = (newLeave: Omit<LeaveRequest, "id" | "status">) => {
-    setLeaves([...leaves, { ...newLeave, id: Date.now(), status: "Pending" }]);
+  // Fetch leaves from the server on load
+  useEffect(() => {
+    const fetchLeaves = async () => {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        setLeaves(data);
+      } catch (err) {
+        console.error("Failed to fetch leaves", err);
+      }
+    };
+    fetchLeaves();
+  }, [API_URL]);
+
+  const addLeave = async (newLeave: Omit<LeaveRequest, "id" | "status">) => {
+    const leaveWithDefaults = { ...newLeave, status: "Pending" };
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leaveWithDefaults),
+      });
+      if (res.ok) {
+        const savedLeave = await res.json();
+        setLeaves((prev) => [...prev, savedLeave]);
+      }
+    } catch (err) {
+      alert("Error submitting leave request");
+    }
   };
 
-  const updateStatus = (id: number, status: "Approved" | "Rejected") => {
-    setLeaves(leaves.map(l => l.id === id ? { ...l, status } : l));
+  const updateStatus = async (id: number, status: "Approved" | "Rejected") => {
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        setLeaves((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
+      }
+    } catch (err) {
+      alert("Error updating leave status");
+    }
   };
 
   return (
