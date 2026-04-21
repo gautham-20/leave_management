@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 // This points to your db.json file
-const dbPath = path.join(process.cwd(), "src/data/db.json");
+const dbPath = path.join(process.cwd(), "db.json");
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     }
     
     const fileData = fs.readFileSync(dbPath, "utf-8");
-    const users = JSON.parse(fileData || "[]");
+    const db = JSON.parse(fileData || "{}");
+    const users: any[] = db.users || [];
 
     // 3. Look for a user where EVERYTHING matches (email, password, AND role)
     const user = users.find((u: any) => 

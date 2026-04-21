@@ -2,19 +2,19 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const dbPath = path.join(process.cwd(), "src/data/db.json");
+const dbPath = path.join(process.cwd(), "db.json");
 
 export async function POST(req: Request) {
   try {
     const { name, email, password, role } = await req.json();
     
-    const dir = path.dirname(dbPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(dbPath)) {
+      return NextResponse.json({ message: "Database file not found." }, { status: 500 });
     }
 
     const fileData = fs.readFileSync(dbPath, "utf-8");
-    const users = JSON.parse(fileData || "[]");
+    const db = JSON.parse(fileData || "{}");
+    const users: any[] = db.users || [];
 
     if (users.find((u: any) => u.email === email)) {
       return NextResponse.json({ message: "User already exists" }, { status: 400 });
@@ -22,8 +22,9 @@ export async function POST(req: Request) {
 
     const newUser = { id: Date.now().toString(), name, email, password, role };
     users.push(newUser);
-    
-    fs.writeFileSync(dbPath, JSON.stringify(users, null, 2));
+    db.users = users;
+
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
 
     return NextResponse.json({ success: true });
 

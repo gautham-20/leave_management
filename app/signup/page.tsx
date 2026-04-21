@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Role } from "@/context/AuthContext";
+import { useAuth, Role } from "@/context/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const { signup } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -14,27 +15,14 @@ export default function SignupPage() {
   const [role, setRole] = useState<Role>("EMPLOYEE");
   const [error, setError] = useState("");
 
-  const API_URL = "http://localhost:5001/users";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create account");
-      }
-
-      
+      await signup({ name, email, password, role });
       alert("Account created successfully!");
-      router.push("/login");
-
+      // redirect handled inside AuthContext signup()
     } catch (err: any) {
       setError(err.message || "Signup failed");
     }

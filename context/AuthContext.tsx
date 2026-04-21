@@ -18,71 +18,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  // ✅ Use env variable properly
-  const API = process.env.NEXT_PUBLIC_API_URL;
 
   // ---------- SIGNUP ----------
-  const signup = async (userData: User) => {
-    try {
-      const response = await fetch(`${API}/users`, {
+ const signup = async (userData: User) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users`,
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
-      });
+      }
+    );
 
-      if (!response.ok) throw new Error("Signup failed");
+    const result = await response.json();
 
-      const newUser = await response.json();
-
-      setUser({
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-      });
-
-      handleRedirect(newUser.role);
-    } catch (error) {
-      console.error("Signup Error:", error);
-      alert("Signup failed. Check backend or network.");
+    if (!response.ok) {
+      throw new Error(result.message || "Signup failed");
     }
-  };
+
+    // Redirect after success
+    router.push("/login");
+  } catch (error: any) {
+    console.error("Signup Error:", error);
+    throw new Error(error.message || "Signup failed. Please try again.");
+  }
+};
 
   // ---------- LOGIN ----------
-  const login = async (email: string, password: string, role: Role) => {
-    try {
-      const response = await fetch(
-        `${API}/users?email=${email}&password=${password}`
-      );
+const login = async (email: string, password: string, role: Role) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users?email=${email}&password=${password}`
+    );
 
-      if (!response.ok) throw new Error("Server error");
+    const result = await response.json();
 
-      const data = await response.json();
-
-      if (!data.length) {
-        alert("Invalid credentials!");
-        return;
-      }
-
-      const foundUser = data[0];
-
-      if (foundUser.role !== role) {
-        alert("Role mismatch!");
-        return;
-      }
-
-      setUser({
-        name: foundUser.name,
-        email: foundUser.email,
-        role: foundUser.role,
-      });
-
-      handleRedirect(foundUser.role);
-    } catch (error) {
-      console.error("Login Error:", error);
-      alert("Failed to fetch. Check backend URL or Render status.");
+    if (!response.ok || result.length === 0) {
+      throw new Error("Invalid credentials");
     }
-  };
 
+    const foundUser = result[0];
+
+    // Optional: role check
+    if (foundUser.role !== role) {
+      throw new Error("Role mismatch");
+    }
+
+    setUser({
+      name: foundUser.name,
+      email: foundUser.email,
+      role: foundUser.role,
+    });
+
+    handleRedirect(foundUser.role);
+  } catch (error: any) {
+    console.error("Login Error:", error);
+    throw new Error(error.message || "Failed to login. Please try again.");
+  }
+};
   // ---------- REDIRECT ----------
   const handleRedirect = (role: Role) => {
     if (role === "EMPLOYEE") router.push("/employee");
